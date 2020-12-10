@@ -1,0 +1,129 @@
+{% extends 'base.html' %} 
+
+{% block title %} | Bem vindo {% endblock %}
+
+{% block content %}
+<!-- Showcase -->
+
+<section>
+    <div class="container text-center">
+      <div class="border p-5 mt-2" style="background-color: rgb(176, 188, 192); border-style: solid; border-color: black;">
+        
+          <h2 class="display-4 mb-4">
+              Nuvens de Palavras dos discursos dos deputados
+          </h2>
+          <p class="lead">Faça nuvens de palavras por deputado ou por partido.</p>
+          <div class="">
+            <form action="{% url 'nuvem' %}">
+              <!-- Form Row 1 -->
+              <div class="form-row">
+                <div class="col-md-6 mb-3">
+                  <label class="sr-only">Deputados</label>
+                  <select name="deputado" class="form-control">
+                    <option selected="true" >Deputados</option>
+                    {% for key,value in nomes.items %}
+                      <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+              </div>
+              <div class="form-row">
+                <div class="col-md-4 mb-2">
+                  <label >Data Inicial</label>
+                  <input type="date" name="inicio" class="form-control" placeholder="Inicio" value = '2019-01-01'>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                  <label >Data Final</label>
+                  <input type="date" name="fim" class="form-control" placeholder="Fim" id='fim'>
+                </div>
+                <div class="col-md-2 mb-2">
+                  <label >Cor Letras</label>
+                  <input type="color" name="cor_l" class="form-control" value="#a2dc27">
+                </div>
+                <div class="col-md-2 mb-2">
+                  <label >Cor Fundo</label>
+                  <input type="color" name="cor_f" class="form-control" value="#2f27dc">
+                </div>
+
+
+                <div class="col-md-4 mb-2">
+                  
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-md-12">
+                  <label for="palavras_deletar">Palavras a excluir (já são excluídas preposições, artigos, etc.)</label>
+                  <input type="text" name='palavras_deletar' class="form-control" placeholder="Coloque palavras separadas com espaço. Exemplo: brasil minas bahia rio">
+                </div>
+
+              </div>
+
+              <button class="btn btn-secondary btn-block mt-3 mb-3" type="submit">Cria Nuvem</button>
+            </form>
+          </div>
+        
+      </div>
+    </div>
+  </section>
+  <section>
+ 
+  <div class="container text-center">
+
+    {%if wordcloud%}
+    <p>Clique na nuvem para aumentar</p>
+  <div class="d-flex flex-wrap justify-content-center" id="nuvens">
+    {%for key, value in wordcloud.items%}
+    
+    <!-- <img src="{{value}}" alt="" style="width: 800px; height:600px"> -->
+    <div class="card m-2" style="width: 18rem;">
+      <img class="card-img-top" src="{{value}}" alt="Nuvem" data-toggle="modal" data-target="#{{key|cut:" "}}">
+      <div class="card-body">
+        <h5 class="card-title">{{key}}</h5>
+      </div>
+    </div>
+
+    <div class="modal fade" id="{{key|cut:" "}}" tabindex="-1" role="dialog" aria-labelledby="{{key}}" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title">{{key}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          </div>
+          <div class="modal-body">
+            <img src="{{value}}" alt="" style="width:100%;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    {%endfor%}
+    {%endif%}
+    
+  </div>
+  </div>
+   
+</section>
+<br>
+<script>
+  Date.prototype.toDateInputValue = (function() {
+    var local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0,10);
+});
+document.getElementById('fim').value = new Date().toDateInputValue();
+</script>
+  <!-- Alerts -->
+  {% include 'partials/_alerts.html' %}
+
+  {%if wordcloud%}
+  <script>
+    window.location = '#nuvens';
+  </script>
+  {%endif%}
+
+  {% endblock %}

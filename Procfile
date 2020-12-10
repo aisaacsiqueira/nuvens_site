@@ -1,0 +1,1 @@
+web: gunicorn nuvens.wsgi:application --log-file - --log-level debug
